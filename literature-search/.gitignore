@@ -1,0 +1,9 @@
+.env
+__pycache__/
+*.pyc
+
+# Raw/derived WoS output: regenerable from your own API key + query, and
+# Clarivate's terms of use restrict bulk redistribution of downloaded
+# records — don't commit these.
+wos_records/
+candidates.csv
