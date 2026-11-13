@@ -81,6 +81,28 @@ Use `--limit N` for a fast smoke-test load of the first N rows before
 committing to the full run. Re-running is safe (idempotent `MERGE`s); use
 `--wipe` to start clean.
 
+Every load also writes a `:Meta {id: 'active_project'}` singleton node
+(project name, paper count, timestamp) — check what's currently loaded
+into this shared Neo4j instance with `python3 query_rag.py status`
+without needing a reload just to find out.
+
+### Snapshot / restore (backup without re-embedding)
+
+```bash
+python3 export_graph.py   # -> data/graph_snapshot.json
+python3 import_graph.py --wipe   # restores from that file
+```
+
+`export_graph.py` dumps every node (including each `EvidenceChunk`'s
+embedding) and relationship to a JSON file, keyed by natural properties
+(`doi`/`name`/`id`, not Neo4j's internal element IDs, which aren't stable
+across a `--wipe`). This is a frozen backup of the graph's *current*
+contents — useful for restoring the exact state without re-running
+classification or re-requesting embeddings from Ollama (e.g. if a model
+update would otherwise produce slightly different vectors). It's a
+supplement to the CSV+code recipe above, not a replacement: the CSV is
+still the source of truth for re-deriving the graph from scratch.
+
 ## 3. Query it
 
 ```bash
